@@ -1,0 +1,67 @@
+name: pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Never let two deploys race: the later one should win, and the earlier one
+# should stop rather than land on top of it.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      # Rebuilt rather than trusted: index.html is generated, and a commit that
+      # edited it by hand should not be what gets published.
+      - run: node tools/build.mjs
+
+      # The build is deterministic, so a difference here means index.html was
+      # edited directly or committed stale. Either way the repository is lying
+      # about what it serves.
+      - name: index.html matches its inputs
+        run: |
+          if ! git diff --quiet -- index.html; then
+            echo "::error::index.html is out of date with vendor/dashboard.html + mock.js."
+            echo "Run 'node tools/build.mjs' and commit the result."
+            git diff --stat -- index.html
+            exit 1
+          fi
+
+      # Only what the page actually serves. vendor/ and tools/ are build
+      # inputs; publishing them would put a second, unmocked copy of the
+      # dashboard on the site.
+      - name: assemble the site
+        run: |
+          mkdir -p _site
+          cp index.html mock.js favicon.svg _site/
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
