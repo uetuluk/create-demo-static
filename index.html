@@ -112,7 +112,30 @@
   #demo-banner a{color:#7aa2f7}
   @media (prefers-reduced-motion:no-preference){#demo-banner{transition:opacity .2s}}
 </style><main>
-  <header><strong>RITSDEV / SITES</strong><div class="row"><a class="button secondary" href="https://github.com/uetuluk/create-public/blob/main/skills/create-ritsdev/SKILL.md">Guide</a><a id="adminlink" class="button secondary hidden" href="https://github.com/uetuluk/create-public/blob/main/deploy/platform/src/routes/admin.ts">System admin</a><span id="account" class="muted">Checking session…</span><button id="signout" class="secondary hidden">Sign out</button></div></header>
+  <header><strong>RITSDEV / SITES</strong><div class="row"><a class="button secondary" href="https://github.com/uetuluk/create-public/blob/main/skills/create-ritsdev/SKILL.md">Guide</a><a id="adminlink" class="button secondary hidden" href="#admin-note">System admin</a><span id="account" class="muted">Checking session…</span><button id="signout" class="secondary hidden">Sign out</button></div></header>
+<section id="admin-note">
+  <h2>The admin view is not part of this demo</h2>
+  <p>Operators get a read-only view of every project and account, live host and
+  runtime resource use, the job queue, and recent audit events. It is rendered
+  by the server, so there is no version of it that can run on a page with no
+  backend — unlike the dashboard around it, which is the real client code.</p>
+  <p><a href="https://github.com/uetuluk/create-public/blob/main/deploy/platform/src/routes/admin.ts">Read what it does</a>
+  · <a href="https://github.com/uetuluk/create-public/blob/main/docs/operations.md#system-admin-view">Operations guide</a>
+  · <a href="#">Close</a></p>
+</section>
+<style>
+  #admin-note{display:none}
+  /* The :target jump scrolls the panel to the top of the viewport, which puts it under
+     the sticky banner and pushes the header off screen. A margin larger than the
+     panel's own offset clamps to zero at the top of the page, so it opens in
+     place with the nav still visible, and still clears the banner from further
+     down the page. */
+  #admin-note:target{display:block;scroll-margin-top:240px;margin:16px auto;max-width:900px;padding:16px 20px;
+    background:#1d2433;color:#c9d3e4;border:1px solid #2c3547;border-radius:8px}
+  #admin-note h2{margin:0 0 8px;font-size:16px;color:#f4f6fb}
+  #admin-note p{margin:0 0 8px;font-size:14px;line-height:1.6}
+  #admin-note a{color:#7aa2f7}
+</style>
   <section class="hero"><h1>Ship small apps to the network.</h1><p class="muted">Static sites, Deno functions, a dedicated PostgreSQL database, and S3-compatible storage. Source comes from the CLI or the public MCP; deployed apps remain inside the private network.</p></section>
   <div id="logged-out" class="hidden">
     <div class="card"><h2>Sign in to start</h2><p class="muted">Any Google account can publish here. New accounts get a quota of three projects.</p><a class="button" href="#">Continue with Google</a></div>

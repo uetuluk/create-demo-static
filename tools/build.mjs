@@ -54,17 +54,50 @@ const BANNER = `<div id="demo-banner" role="note">
  * pointed somewhere that exists.
  */
 const LINKS = {
-    // Server-rendered pages with no static equivalent. The source is the
-    // honest destination for someone who wants to see what they do.
-    '/admin': 'https://github.com/uetuluk/create-public/blob/main/deploy/platform/src/routes/admin.ts',
+    // The admin view is rendered by the server, so there is nothing static to
+    // link to. Sending someone to admin.ts instead was worse than useless: a
+    // nav button that looks like part of the app and drops you into a
+    // TypeScript file. It opens an explanation on the page instead, and offers
+    // the source to whoever actually wants it.
+    '/admin': '#admin-note',
+    // The guide is a document, so GitHub renders the real thing.
     '/skills/create-ritsdev/SKILL.md': 'https://github.com/uetuluk/create-public/blob/main/skills/create-ritsdev/SKILL.md',
     // Sign-in is already mocked as complete, so this should not navigate.
     '/auth/google': '#',
     '/favicon.svg': './favicon.svg',
 }
 
+/**
+ * Revealed by `:target` when the admin link is clicked — no script, so it
+ * cannot break if the dashboard's own JS changes shape underneath it.
+ */
+const ADMIN_NOTE = `<section id="admin-note">
+  <h2>The admin view is not part of this demo</h2>
+  <p>Operators get a read-only view of every project and account, live host and
+  runtime resource use, the job queue, and recent audit events. It is rendered
+  by the server, so there is no version of it that can run on a page with no
+  backend — unlike the dashboard around it, which is the real client code.</p>
+  <p><a href="https://github.com/uetuluk/create-public/blob/main/deploy/platform/src/routes/admin.ts">Read what it does</a>
+  · <a href="https://github.com/uetuluk/create-public/blob/main/docs/operations.md#system-admin-view">Operations guide</a>
+  · <a href="#">Close</a></p>
+</section>
+<style>
+  #admin-note{display:none}
+  /* The :target jump scrolls the panel to the top of the viewport, which puts it under
+     the sticky banner and pushes the header off screen. A margin larger than the
+     panel's own offset clamps to zero at the top of the page, so it opens in
+     place with the nav still visible, and still clears the banner from further
+     down the page. */
+  #admin-note:target{display:block;scroll-margin-top:240px;margin:16px auto;max-width:900px;padding:16px 20px;
+    background:#1d2433;color:#c9d3e4;border:1px solid #2c3547;border-radius:8px}
+  #admin-note h2{margin:0 0 8px;font-size:16px;color:#f4f6fb}
+  #admin-note p{margin:0 0 8px;font-size:14px;line-height:1.6}
+  #admin-note a{color:#7aa2f7}
+</style>`
+
 let out = source
     .replace('<body>', `<body>\n${BANNER}`)
+    .replace('</header>', `</header>\n${ADMIN_NOTE}`)
     .replace(ANCHOR, '</main><script src="./mock.js"></script><script>')
 
 for (const [from, to] of Object.entries(LINKS)) {
